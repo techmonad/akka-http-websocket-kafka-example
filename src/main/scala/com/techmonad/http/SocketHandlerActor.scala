@@ -13,6 +13,8 @@ import scala.concurrent.duration._
 
 class SocketHandlerActor(queryId: String) extends Actor with Logging {
 
+  import SocketHandlerActor._
+
   import PublisherActor._
 
   implicit val system = context.system
@@ -27,7 +29,7 @@ class SocketHandlerActor(queryId: String) extends Actor with Logging {
     .run()
 
   override def receive: Receive = {
-    case GetWebsocketFlow =>
+    case GetSocketFlow =>
       val flow = Flow.fromGraph(GraphDSL.create() { implicit b =>
         val textMsgFlow: FlowShape[Message, String] = b.add(Flow[Message]
           .mapAsync(1) {
@@ -58,6 +60,8 @@ object SocketHandlerActor {
 
   def props(queryId: String): Props =
     Props(classOf[SocketHandlerActor], queryId)
+
+  case object GetSocketFlow
 
 
 }
