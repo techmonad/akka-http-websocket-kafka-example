@@ -46,3 +46,5 @@ object WebSocketTest {
     closed.foreach(_ => println("closed"))
   }
 }
+
+//ws://localhost:9192/connect?query_id=5bf189eb3b4496810778b2ce

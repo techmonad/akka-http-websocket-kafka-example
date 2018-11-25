@@ -16,18 +16,16 @@ class Routes(implicit system: ActorSystem, materializer: ActorMaterializer, quer
 
   val socketRoutes =
     pathEndOrSingleSlash {
-      complete("WS server is alive\n")
+      complete("WS server is alive ")
     } ~
       path("connect") {
         get {
           parameters('query_id.as[String]) { queryId =>
-
             val handler = system.actorOf(SocketHandlerActor.props(queryId))
             // subscribe from kafka
             queryResultPublisher ! PublisherActor.Subscribe(queryId, handler)
-
             val futureFlow: Future[Flow[Message, Message, _]] =
-              (handler ? GetWebsocketFlow) (3.seconds).mapTo[Flow[Message, Message, _]]
+              (handler ? SocketHandlerActor.GetSocketFlow) (3.seconds).mapTo[Flow[Message, Message, _]]
             onComplete(futureFlow) {
               case Success(flow) => handleWebSocketMessages(flow)
               case Failure(err) => complete(err.toString)
@@ -38,4 +36,3 @@ class Routes(implicit system: ActorSystem, materializer: ActorMaterializer, quer
 }
 
 
-case object GetWebsocketFlow
